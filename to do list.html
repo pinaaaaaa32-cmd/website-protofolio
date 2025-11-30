@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Daily Tasks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 650px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .date-display {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .check-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-status h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .status-card.highlight {
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .status-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .status-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .status-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .progress-section {
+            margin-bottom: 25px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        #taskInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #deadlineInput {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            min-width: 180px;
+        }
+
+        #deadlineInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #addBtn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            white-space: nowrap;
+        }
+
+        #addBtn:hover {
+            transform: translateY(-2px);
+        }
+
+        #addBtn:active {
+            transform: translateY(0);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .task-item.overdue {
+            border-left-color: #ff4757;
+            background: #ffe0e3;
+        }
+
+        .task-item.due-soon {
+            border-left-color: #ffa502;
+            background: #fff4e0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            background: #e8f5e9;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .task-text {
+            color: #333;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #999;
+            flex-wrap: wrap;
+        }
+
+        .task-deadline {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-deadline.overdue {
+            color: #ff4757;
+            font-weight: bold;
+        }
+
+        .task-deadline.due-soon {
+            color: #ffa502;
+            font-weight: bold;
+        }
+
+        .task-time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .delete-btn:hover {
+            background: #ff3838;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        #clearCompleted {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        #clearCompleted:hover {
+            background: #ff3838;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            #deadlineInput {
+                min-width: 100%;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .task-item {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 My Daily Tasks</h1>
+            <div class="date-display" id="dateDisplay"></div>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="check-status">
+            <h3>📊 Status Tugas Hari Ini</h3>
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-icon">📋</div>
+                    <div class="status-number" id="totalTasksMain">0</div>
+                    <div class="status-label">Total Tugas</div>
+                </div>
+                <div class="status-card highlight">
+                    <div class="status-icon">⏳</div>
+                    <div class="status-number" id="pendingTasksMain">0</div>
+                    <div class="status-label">Belum Dikerjakan</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-label">
+                <span>Progress Penyelesaian</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">Selesai ✅</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="pendingTasks">0</div>
+                <div class="stat-label">Belum ⏳</div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-row">
+                <input type="text" id="taskInput" placeholder="Tambahkan tugas baru..." />
+            </div>
+            <div class="input-row">
+                <input type="date" id="deadlineInput" />
+                <button id="addBtn">➕ Tambah Tugas</button>
+            </div>
+        </div>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Semua</button>
+            <button class="filter-btn" data-filter="active">Aktif</button>
+            <button class="filter-btn" data-filter="completed">Selesai</button>
+            <button class="filter-btn" data-filter="overdue">Terlambat</button>
+        </div>
+
+        <ul class="task-list" id="taskList"></ul>
+
+        <button id="clearCompleted">🗑️ Hapus Tugas yang Selesai</button>
+    </div>
+
+    <script>
+        let tasks = [];
+        let currentFilter = 'all';
+
+        function loadTasks() {
+            const saved = localStorage.getItem('dailyTasks');
+            if (saved) {
+                tasks = JSON.parse(saved);
+            }
+        }
+
+        function saveTasks() {
+            localStorage.setItem('dailyTasks', JSON.stringify(tasks));
+        }
+
+        function displayDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date().toLocaleDateString('id-ID', options);
+            document.getElementById('dateDisplay').textContent = today;
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'block';
+            
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 3000);
+        }
+
+        function getDeadlineStatus(deadline) {
+            if (!deadline) return null;
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const deadlineDate = new Date(deadline);
+            deadlineDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) return 'overdue';
+            if (diffDays <= 2) return 'due-soon';
+            return 'normal';
+        }
+
+        function formatDeadline(deadline) {
+            if (!deadline) return '';
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const deadlineDate = new Date(deadline);
+            deadlineDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            const dateStr = deadlineDate.toLocaleDateString('id-ID', options);
+            
+            if (diffDays < 0) {
+                return `${dateStr} (Terlambat ${Math.abs(diffDays)} hari) 🔴`;
+            } else if (diffDays === 0) {
+                return `${dateStr} (Hari ini!) ⚠️`;
+            } else if (diffDays === 1) {
+                return `${dateStr} (Besok) ⚠️`;
+            } else if (diffDays <= 2) {
+                return `${dateStr} (${diffDays} hari lagi) ⏰`;
+            } else {
+                return `${dateStr} (${diffDays} hari lagi)`;
+            }
+        }
+
+        function updateStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const pending = total - completed;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('totalTasksMain').textContent = total;
+            document.getElementById('pendingTasksMain').textContent = pending;
+
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('pendingTasks').textContent = pending;
+
+            document.getElementById('progressPercent').textContent = percentage + '%';
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+
+            // Check for overdue tasks
+            const overdueTasks = tasks.filter(t => !t.completed && t.deadline && getDeadlineStatus(t.deadline) === 'overdue').length;
+            
+            if (total > 0 && pending === 0) {
+                showAlert('🎉 Selamat! Semua tugas sudah selesai!', 'success');
+            } else if (overdueTasks > 0) {
+                showAlert(`⚠️ Anda punya ${overdueTasks} tugas yang terlambat!`, 'warning');
+            } else if (pending > 5) {
+                showAlert(`⚠️ Anda masih punya ${pending} tugas yang belum dikerjakan!`, 'warning');
+            }
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const deadlineInput = document.getElementById('deadlineInput');
+            const text = input.value.trim();
+            const deadline = deadlineInput.value;
+
+            if (text === '') {
+                showAlert('❌ Mohon masukkan tugas!', 'warning');
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                text: text,
+                completed: false,
+                deadline: deadline || null,
+                time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            tasks.unshift(task);
+            input.value = '';
+            deadlineInput.value = '';
+            saveTasks();
+            renderTasks();
+            showAlert('✅ Tugas berhasil ditambahkan!', 'success');
+        }
+
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+                
+                if (task.completed) {
+                    showAlert('✅ Tugas selesai!', 'success');
+                }
+            }
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+            showAlert('🗑️ Tugas berhasil dihapus!', 'success');
+        }
+
+        function clearCompleted() {
+            const completedCount = tasks.filter(t => t.completed).length;
+            if (completedCount === 0) {
+                showAlert('ℹ️ Tidak ada tugas yang selesai untuk dihapus!', 'warning');
+                return;
+            }
+
+            if (confirm(`Hapus ${completedCount} tugas yang sudah selesai?`)) {
+                tasks = tasks.filter(t => !t.completed);
+                saveTasks();
+                renderTasks();
+                showAlert(`✅ ${completedCount} tugas berhasil dihapus!`, 'success');
+            }
+        }
+
+        function filterTasks() {
+            if (currentFilter === 'all') return tasks;
+            if (currentFilter === 'active') return tasks.filter(t => !t.completed);
+            if (currentFilter === 'completed') return tasks.filter(t => t.completed);
+            if (currentFilter === 'overdue') return tasks.filter(t => !t.completed && t.deadline && getDeadlineStatus(t.deadline) === 'overdue');
+            return tasks;
+        }
+
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            const filteredTasks = filterTasks();
+
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 60px;">📋</div>
+                        <p>Tidak ada tugas ${currentFilter === 'all' ? '' : currentFilter === 'active' ? 'aktif' : currentFilter === 'completed' ? 'yang selesai' : 'yang terlambat'}</p>
+                    </div>
+                `;
+            } else {
+                taskList.innerHTML = filteredTasks.map(task => {
+                    const deadlineStatus = task.deadline ? getDeadlineStatus(task.deadline) : null;
+                    const deadlineClass = task.completed ? '' : (deadlineStatus || '');
+                    
+                    return `
+                        <li class="task-item ${task.completed ? 'completed' : ''} ${deadlineClass}">
+                            <input type="checkbox" class="checkbox" ${task.completed ? 'checked' : ''} 
+                                   onchange="toggleTask(${task.id})">
+                            <div class="task-content">
+                                <span class="task-text">${task.text}</span>
+                                <div class="task-meta">
+                                    <span class="task-time">🕐 ${task.time}</span>
+                                    ${task.deadline ? `<span class="task-deadline ${deadlineStatus || ''}">📅 ${formatDeadline(task.deadline)}</span>` : ''}
+                                </div>
+                            </div>
+                            <button class="delete-btn" onclick="deleteTask(${task.id})">Hapus</button>
+                        </li>
+                    `;
+                }).join('');
+            }
+
+            updateStats();
+        }
+
+        // Event listeners
+        document.getElementById('addBtn').addEventListener('click', addTask);
+        document.getElementById('taskInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        document.getElementById('clearCompleted').addEventListener('click', clearCompleted);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                renderTasks();
+            });
+        });
+
+        // Inisialisasi
+        loadTasks();
+        displayDate();
+        renderTasks();
+    </script>
+</body>
+</html>
